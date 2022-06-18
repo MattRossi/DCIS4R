@@ -1,5 +1,6 @@
 import praw
 import configparser
+from Organization import Orgs
 
 class RedditUtils:
     def __init__(self):
@@ -19,8 +20,15 @@ class RedditUtils:
             self.title = title
             self.body = body
 
-    def submit_post(self, post):
+    def submit_post(self, post, org):
+        print('Submitting post!')
         choices = self.subreddit.flair.link_templates
         template = next(x for x in choices if x['text'] == 'Show Thread')['id']
-        #submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
-        #submission.mod.distinguish(sticky=True)
+        submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
+        print('https://reddit.com' + submission.permalink)
+        submission.mod.distinguish(sticky=True)
+        if (org == Orgs.DCA):
+            bottom = True
+        else:
+            bottom = False
+        submission.mod.sticky(bottom=bottom)

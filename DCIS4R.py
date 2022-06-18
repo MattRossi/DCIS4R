@@ -21,7 +21,7 @@ def generate_post(parsed_shows, org):
     post_title = PostFormatter.create_title(parsed_shows, org, today)
     print(post_title)
     post = RedditUtils.RedditPost(post_title, final_body)
-    RedditUtils().submit_post(post)
+    RedditUtils().submit_post(post, org)
 
 try:
     BROWSER = BrowserUtils.create_browser()
