@@ -10,16 +10,22 @@ class DCIUtils:
             self.date = date
             self.url = url
             self.timezone = ''
-            self.flo = ''
+            self.streaming = ''
+            self.image = ''
+            self.full_date = ''
             self.lineup = ['']
         def __str__(self):
-            return 'Show[name={}, location={}, date={}, url={}, timezone={}, flo={}, lineup=[{}]]'.format(self.name, self.location, self.date, self.url, self.timezone, self.flo, ','.join([str(x) for x in self.lineup]))
+            return 'Show[name={}, location={}, date={}, url={}, timezone={}, streaming={}, image={}, full_date={}, lineup=[{}]]'.format(self.name, self.location, self.date, self.url, self.timezone, self.streaming, self.image, self.full_date, ','.join([str(x) for x in self.lineup]))
         def add_location(self, location):
             self.location = location
         def add_timezone(self, timezone):
             self.timezone = timezone
-        def add_flo(self, flo):
-            self.flo = flo
+        def add_streaming(self, streaming):
+            self.streaming = streaming
+        def add_image(self, image):
+            self.image = image
+        def add_full_date(self, full_date):
+            self.full_date = full_date
         def add_lineup(self, lineup):
             self.lineup = lineup
 
@@ -54,7 +60,7 @@ class DCIUtils:
             shows.append(show)
         return shows
 
-    def grab_flo_link(show, soup):
+    def grab_streaming_link(show, soup):
         buttons = soup.select(selector="[class='buttons']")[0]
         for element in buttons(text=lambda text: isinstance(text, Comment)):
             element.extract()
@@ -62,7 +68,7 @@ class DCIUtils:
             print('No FloMarching link for {}!'.format(show.name))
         else:
             rawLink = buttons.select(selector="*:first-child")[0].get('href')
-            show.add_flo(rawLink.split('?')[0])
+            show.add_streaming(rawLink.split('?')[0])
 
     def show_page_parser(browser, shows):
         parsedShows = []
@@ -71,7 +77,9 @@ class DCIUtils:
             soup, root = BrowserUtils.open_url(browser, show.url)
             show.add_location(soup.select(selector="[class='location']")[0].getText().strip())
             show.add_timezone(root.xpath("//p[contains(., 'and subject')]//span")[0].text)
-            DCIUtils.grab_flo_link(show, soup)
+            show.add_image(soup.select(selector="div[class*=event-details-visual] img")[0].get('src'))
+            show.add_full_date(soup.select(selector="span[class='date']")[0].getText().strip().replace('\n', ''))
+            DCIUtils.grab_streaming_link(show, soup)
             slots = soup.select(selector="[class='time-table'] > div")
             lineup = []
             for slot in slots:
@@ -103,6 +111,6 @@ class DCIPostFormatter:
     def create_show_block(show):
         body = PostFormatter.create_header(show, 'DCI')
         body = DCIPostFormatter.create_table(show, body)
-        if show.flo:
-            body = body + '\n^(Watch live on) [^(FloMarching)]({})'.format(show.flo)
+        if show.streaming:
+            body = body + '\n^(Watch live on) [^(FloMarching)]({})'.format(show.streaming)
         return body

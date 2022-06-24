@@ -1,25 +1,29 @@
 from datetime import datetime
 from Selenium import BrowserUtils
-from Formatter import PostFormatter
-from Reddit import RedditUtils
 from Organization import Orgs
+import requests
+from Webhook import Webhook
+import json
+import time
+import configparser
 
 today = datetime.now()
-#today = datetime(2022, 7, 16)
+#today = datetime(2022, 6, 24)
+
+config = configparser.ConfigParser()
+config.read('config.properties')
 
 def generate_post(parsed_shows, org):
     print('\n'.join([str(x) for x in parsed_shows]))
-    final_body = ''
     for show in parsed_shows:
-        final_body = final_body + org.formatter.create_show_block(show)
-        final_body = final_body + '\n\n'
-    final_body = PostFormatter.create_post_footer(final_body)
-    print('Printing final body')
-    print(final_body)
-    post_title = PostFormatter.create_title(parsed_shows, org, today)
-    print(post_title)
-    post = RedditUtils.RedditPost(post_title, final_body)
-    RedditUtils().submit_post(post, org)
+        print('Posting {}'.format(show.name))
+        response = requests.post(
+            url=config['DISCORD']['WEBHOOK'],
+            data=json.dumps(Webhook.embedBuilder(show, org)),
+            headers={'Content-Type': 'application/json'}
+        )
+        print('Response Code: {} | Response Content: {}'.format(response.status_code, response.content))
+        time.sleep(5)
 
 try:
     BROWSER = BrowserUtils.create_browser()
