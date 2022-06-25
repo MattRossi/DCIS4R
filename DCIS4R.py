@@ -7,6 +7,9 @@ from Organization import Orgs
 today = datetime.now()
 #today = datetime(2022, 7, 16)
 
+should_we_post = True
+#should_we_post = False
+
 def generate_post(parsed_shows, org):
     print('\n'.join([str(x) for x in parsed_shows]))
     final_body = ''
@@ -19,7 +22,7 @@ def generate_post(parsed_shows, org):
     post_title = PostFormatter.create_title(parsed_shows, org, today)
     print(post_title)
     post = RedditUtils.RedditPost(post_title, final_body)
-    RedditUtils().submit_post(post, org)
+    RedditUtils().submit_post(post, org, should_we_post)
 
 try:
     BROWSER = BrowserUtils.create_browser()

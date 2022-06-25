@@ -20,15 +20,24 @@ class RedditUtils:
             self.title = title
             self.body = body
 
-    def submit_post(self, post, org):
+    def submit_post(self, post, org, should_we_post):
         print('Submitting post!')
         choices = self.subreddit.flair.link_templates
         template = next(x for x in choices if x['text'] == 'Show Thread')['id']
-        submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
-        print('https://reddit.com' + submission.permalink)
-        submission.mod.distinguish(sticky=True)
-        if (org == Orgs.DCA):
-            bottom = True
-        else:
-            bottom = False
-        submission.mod.sticky(bottom=bottom)
+        if should_we_post:
+            submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
+            print('https://reddit.com' + submission.permalink)
+            submission.mod.distinguish(sticky=True)
+            if (org == Orgs.DCA):
+                bottom = True
+            else:
+                bottom = False
+            submission.mod.sticky(bottom=bottom)
+            collections = self.subreddit.collections
+            for coll in collections:
+                print(coll.title + ' | ' + coll.collection_id)
+            collection = next(x for x in collections if x.title == '2022 Drum Corps Season').collection_id
+            if collection:
+                self.subreddit.collections(collection).mod.add_post(submission=submission)
+            else:
+                print('Collection not found!')
