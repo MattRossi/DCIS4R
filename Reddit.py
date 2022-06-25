@@ -1,6 +1,6 @@
-import praw
-import configparser
 from Organization import Orgs
+import configparser
+import praw
 
 class RedditUtils:
     def __init__(self):
@@ -22,6 +22,14 @@ class RedditUtils:
 
     def submit_post(self, post, org, should_we_post):
         if should_we_post:
+            print('Unsticking any sticky posts')
+            fixed = False
+            while not fixed:
+                sub_post = next(self.subreddit.hot())
+                if sub_post.stickied:
+                    sub_post.mod.sticky(state=False)
+                else:
+                    fixed = True
             print('Posting to Reddit!')
             choices = self.subreddit.flair.link_templates
             template = next(x for x in choices if x['text'] == 'Show Thread')['id']
