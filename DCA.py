@@ -75,10 +75,10 @@ class DCAPostFormatter:
         table = table + '|{}|{}|\n'.format(columns[0], columns[1])
         table = table + '|:-|:-|\n'
         for p in show.lineup:
-            table = table + '|X|{}|\n'.format(p)
+            table = table + '|-|{}|\n'.format(p)
         body = body + table
         return body
-    
+
     def create_show_block(show):
         body = PostFormatter.create_header(show, 'DCA')
         body = DCAPostFormatter.create_table(show, body)

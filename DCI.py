@@ -71,7 +71,7 @@ class DCIUtils:
             show.add_streaming(rawLink.split('?')[0])
 
     def show_page_parser(browser, shows):
-        parsedShows = []
+        parsed_shows = []
         for show in shows:
             print('Parsing: ' + show.name)
             soup, root = BrowserUtils.open_url(browser, show.url)
@@ -94,8 +94,8 @@ class DCIUtils:
                     location = ''
                 lineup.append(DCIUtils.LineupSlot(corps, time, location))
             show.add_lineup(lineup)
-            parsedShows.append(show)
-        return parsedShows
+            parsed_shows.append(show)
+        return parsed_shows
 
 class DCIPostFormatter:
     def create_table(show, body):

@@ -10,20 +10,27 @@ import configparser
 today = datetime.now()
 #today = datetime(2022, 6, 24)
 
+should_we_post = True
+#should_we_post = False
+
 config = configparser.ConfigParser()
 config.read('config.properties')
 
 def generate_post(parsed_shows, org):
-    print('\n'.join([str(x) for x in parsed_shows]))
-    for show in parsed_shows:
-        print('Posting {}'.format(show.name))
-        response = requests.post(
-            url=config['DISCORD']['WEBHOOK'],
-            data=json.dumps(Webhook.embedBuilder(show, org)),
-            headers={'Content-Type': 'application/json'}
-        )
-        print('Response Code: {} | Response Content: {}'.format(response.status_code, response.content))
-        time.sleep(5)
+    if should_we_post:
+        print('Posting to Discord!')
+        print('\n'.join([str(x) for x in parsed_shows]))
+        for show in parsed_shows:
+            print('Posting {}'.format(show.name))
+            response = requests.post(
+                url=config['DISCORD']['WEBHOOK'],
+                data=json.dumps(Webhook.embedBuilder(show, org)),
+                headers={'Content-Type': 'application/json'}
+            )
+            print('Response Code: {} | Response Content: {}'.format(response.status_code, response.content))
+            time.sleep(5)
+    else:
+        print('Not posting to Discord!')
 
 try:
     BROWSER = BrowserUtils.create_browser()

@@ -21,10 +21,10 @@ class RedditUtils:
             self.body = body
 
     def submit_post(self, post, org, should_we_post):
-        print('Submitting post!')
-        choices = self.subreddit.flair.link_templates
-        template = next(x for x in choices if x['text'] == 'Show Thread')['id']
         if should_we_post:
+            print('Posting to Reddit!')
+            choices = self.subreddit.flair.link_templates
+            template = next(x for x in choices if x['text'] == 'Show Thread')['id']
             submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
             print('https://reddit.com' + submission.permalink)
             submission.mod.distinguish(sticky=True)
@@ -41,3 +41,5 @@ class RedditUtils:
                 self.subreddit.collections(collection).mod.add_post(submission=submission)
             else:
                 print('Collection not found!')
+        else:
+            print('Not posting to Reddit!')

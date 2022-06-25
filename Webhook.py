@@ -26,6 +26,7 @@ class Webhook:
     def embedBuilder(show, org):
         author = {
             "name": show.name, # show name
+            "url": show.url, # show page
             "icon_url": Webhook.icon_url.get(org) #org logo
         }
         footer = {
