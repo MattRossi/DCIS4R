@@ -20,27 +20,31 @@ class RedditUtils:
             self.title = title
             self.body = body
 
+    def handle_stickies(self):
+        print('Unsticking any sticky posts')
+        try:
+            secondSticky = self.subreddit.sticky(2)
+            print('Unsticking https://reddit.com' + secondSticky.permalink)
+            secondSticky.mod.sticky(state=False)
+        except:
+            print('There are one or less sticky posts!')
+        try:
+            firstSticky = self.subreddit.sticky(1)
+            print('Unsticking https://reddit.com' + firstSticky.permalink)
+            firstSticky.mod.sticky(state=False)
+        except:
+            print('No sticky posts found!')
+
     def submit_post(self, post, org, should_we_post):
         if should_we_post:
-            print('Unsticking any sticky posts')
-            fixed = False
-            while not fixed:
-                sub_post = next(self.subreddit.hot())
-                if sub_post.stickied:
-                    sub_post.mod.sticky(state=False)
-                else:
-                    fixed = True
+            self.handle_stickies()
             print('Posting to Reddit!')
             choices = self.subreddit.flair.link_templates
             template = next(x for x in choices if x['text'] == 'Show Thread')['id']
             submission = self.subreddit.submit(title=post.title, flair_id=template, selftext=post.body)
-            print('https://reddit.com' + submission.permalink)
+            print('Created https://reddit.com' + submission.permalink)
             submission.mod.distinguish(sticky=True)
-            if (org == Orgs.DCA):
-                bottom = True
-            else:
-                bottom = False
-            submission.mod.sticky(bottom=bottom)
+            submission.mod.sticky(bottom=True if org == Orgs.DCA else False)
             collections = self.subreddit.collections
             for coll in collections:
                 print(coll.title + ' | ' + coll.collection_id)

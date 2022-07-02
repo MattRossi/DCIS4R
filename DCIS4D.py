@@ -22,6 +22,7 @@ def generate_post(parsed_shows, org):
         print('\n'.join([str(x) for x in parsed_shows]))
         for show in parsed_shows:
             print('Posting {}'.format(show.name))
+            print(json.dumps(Webhook.embedBuilder(show, org)))
             response = requests.post(
                 url=config['DISCORD']['WEBHOOK'],
                 data=json.dumps(Webhook.embedBuilder(show, org)),
